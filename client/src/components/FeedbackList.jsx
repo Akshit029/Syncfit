@@ -31,7 +31,7 @@ const FeedbackList = forwardRef(({ showUserActions = false, filterByUser = null,
     setLoading(true); // Ensure loading is set on every refresh
     setError('');
     try {
-      const response = await fetch('http://localhost:5001/api/feedback');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/feedback`);
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -52,7 +52,7 @@ const FeedbackList = forwardRef(({ showUserActions = false, filterByUser = null,
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/feedback/${feedbackId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

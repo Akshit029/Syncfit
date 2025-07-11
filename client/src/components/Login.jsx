@@ -17,7 +17,7 @@ export default function SyncFitLogin() {
     if (e) e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/auth/login', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

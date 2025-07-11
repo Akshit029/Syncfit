@@ -19,7 +19,7 @@ const SyncFitProfile = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5001/api/auth/profile', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -93,7 +93,7 @@ const SyncFitProfile = () => {
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch('http://localhost:5001/api/auth/profile-image', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/profile-image`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -117,7 +117,7 @@ const SyncFitProfile = () => {
     setUploadStatus(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/auth/profile-image', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/profile-image`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -199,7 +199,7 @@ const SyncFitProfile = () => {
                     {/* Show profile image if available */}
                     {userData?.profileImage ? (
                       <img
-                        src={`http://localhost:5001${userData.profileImage}`}
+                        src={`${process.env.REACT_APP_API_URL}${userData.profileImage}`}
                         alt="Profile"
                         className="w-full h-full object-cover rounded-full"
                       />
