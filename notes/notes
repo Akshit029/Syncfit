@@ -1,0 +1,13 @@
+Server 
+npm install
+   npm install pdfkit
+
+
+
+Client
+npm install
+npm install tailwindcss@3 react-router-dom
+npx tailwindcss init -p
+npm run build
+npm install lucide-react
+npm install recharts
