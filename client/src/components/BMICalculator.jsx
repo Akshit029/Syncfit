@@ -96,7 +96,7 @@ const BMICalculators = () => {
     setSaveStatus(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/bmi/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/bmi/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const BMICalculators = () => {
     setCaloriesSaveStatus(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/calories/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/calories/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

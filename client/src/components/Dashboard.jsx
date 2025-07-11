@@ -30,19 +30,19 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       try {
         // Activity summary (last 7 days)
-        const actRes = await fetch('http://localhost:5001/api/activity/summary', {
+        const actRes = await fetch(`${process.env.REACT_APP_API_URL}/api/activity/summary`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const actData = await actRes.json();
         setActivitySummary(Array.isArray(actData) ? actData : []);
         // Weight history (last 30 days)
-        const wRes = await fetch('http://localhost:5001/api/weight/history', {
+        const wRes = await fetch(`${process.env.REACT_APP_API_URL}/api/weight/history`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const wData = await wRes.json();
         setWeightHistory(Array.isArray(wData) ? wData : []);
         // Milestones
-        const mRes = await fetch('http://localhost:5001/api/milestone/', {
+        const mRes = await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const mData = await mRes.json();
@@ -82,7 +82,7 @@ const Dashboard = () => {
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
-      await fetch('http://localhost:5001/api/activity/', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/activity/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const Dashboard = () => {
       setWorkouts('');
       setCalories('');
       // Refresh summary
-      const actRes = await fetch('http://localhost:5001/api/activity/summary', {
+      const actRes = await fetch(`${process.env.REACT_APP_API_URL}/api/activity/summary`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const actData = await actRes.json();
@@ -113,7 +113,7 @@ const Dashboard = () => {
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
-      await fetch('http://localhost:5001/api/weight/', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/weight/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const Dashboard = () => {
       });
       setWeight('');
       // Refresh weight history
-      const wRes = await fetch('http://localhost:5001/api/weight/history', {
+      const wRes = await fetch(`${process.env.REACT_APP_API_URL}/api/weight/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const wData = await wRes.json();
@@ -141,7 +141,7 @@ const Dashboard = () => {
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
-      await fetch('http://localhost:5001/api/milestone/', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const Dashboard = () => {
       });
       setMilestone('');
       // Refresh milestones
-      const mRes = await fetch('http://localhost:5001/api/milestone/', {
+      const mRes = await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const mData = await mRes.json();
@@ -166,7 +166,7 @@ const Dashboard = () => {
   const handleDeleteMilestone = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      await fetch(`http://localhost:5001/api/milestone/${id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -180,9 +180,9 @@ const Dashboard = () => {
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
-      await fetch('http://localhost:5001/api/activity/history', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-      await fetch('http://localhost:5001/api/weight/history', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-      await fetch('http://localhost:5001/api/milestone/', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${process.env.REACT_APP_API_URL}/api/activity/history`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${process.env.REACT_APP_API_URL}/api/weight/history`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       setWorkouts('');
       setCalories('');
       setWeight('');
@@ -200,19 +200,19 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     try {
       // Activity summary (last 7 days)
-      const actRes = await fetch('http://localhost:5001/api/activity/summary', {
+      const actRes = await fetch(`${process.env.REACT_APP_API_URL}/api/activity/summary`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const actData = await actRes.json();
       setActivitySummary(Array.isArray(actData) ? actData : []);
       // Weight history (last 30 days)
-      const wRes = await fetch('http://localhost:5001/api/weight/history', {
+      const wRes = await fetch(`${process.env.REACT_APP_API_URL}/api/weight/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const wData = await wRes.json();
       setWeightHistory(Array.isArray(wData) ? wData : []);
       // Milestones
-      const mRes = await fetch('http://localhost:5001/api/milestone/', {
+      const mRes = await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const mData = await mRes.json();

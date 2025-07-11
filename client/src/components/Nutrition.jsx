@@ -27,7 +27,7 @@ const Nutrition = () => {
     setLoading(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5001/api/nutrition/history', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nutrition/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -82,7 +82,7 @@ const Nutrition = () => {
     const newCarbs = newMeals.reduce((sum, m) => sum + (m.carbs || 0), 0);
     const newFats = newMeals.reduce((sum, m) => sum + (m.fats || 0), 0);
     try {
-      await fetch('http://localhost:5001/api/nutrition/', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/nutrition/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ const Nutrition = () => {
     const newCarbs = newMeals.reduce((sum, m) => sum + (m.carbs || 0), 0);
     const newFats = newMeals.reduce((sum, m) => sum + (m.fats || 0), 0);
     try {
-      await fetch('http://localhost:5001/api/nutrition/', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/nutrition/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -593,7 +593,7 @@ function DietForm() {
       `Sleep Quality: ${form.sleep}\n` +
       `\nPlease provide a detailed meal plan for each day, with meal breakdowns, and ensure all restrictions and preferences are followed. Format the output clearly for the user.`;
     try {
-      const res = await fetch('http://localhost:5001/api/gemini/ask', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/gemini/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: prompt })
@@ -813,7 +813,7 @@ function DietForm() {
                 return daySections.map((section, idx) => {
                   const dayLabel = idx === 0 ? null : `🗓️ Day ${idx}`;
                   // Split by meal headings
-                  const meals = section.split(/(🍳 Breakfast|🥗 Lunch|��️ Dinner|Snack)/i).filter(Boolean);
+                  const meals = section.split(/(🍳 Breakfast|🥗 Lunch|🍽️ Dinner|Snack)/i).filter(Boolean);
                   return (
                     <div key={idx} className="mb-6 p-4 bg-slate-800 rounded-xl shadow">
                       {dayLabel && <div className="text-lg font-bold text-blue-300 mb-2">{dayLabel}</div>}

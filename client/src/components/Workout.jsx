@@ -111,7 +111,7 @@ function WorkoutPlanForm() {
       `Motivation Level: ${form.motivation}\n` +
       `\nPlease provide a detailed workout plan for each day, with exercise breakdowns, sets, reps, rest, and ensure all restrictions and preferences are followed. Format the output clearly for the user.`;
     try {
-      const res = await fetch('http://localhost:5001/api/gemini/ask', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/gemini/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: prompt })
@@ -140,7 +140,7 @@ function WorkoutPlanForm() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5001/api/pdf/send', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/pdf/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, content: result, type: 'workout' })

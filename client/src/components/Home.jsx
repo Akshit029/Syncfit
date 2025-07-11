@@ -41,7 +41,7 @@ function WorkoutPlanForm({ onClose }) {
       `Workout Preferences: ${form.preferences}\n` +
       `\nPlease provide a detailed workout plan for each day, with exercise breakdowns, sets, reps, and rest, and ensure all restrictions and preferences are followed. Format the output clearly for the user.`;
     try {
-      const res = await fetch('http://localhost:5001/api/gemini/ask', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/gemini/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: prompt })
@@ -226,7 +226,7 @@ const Home = () => {
     const fetchNutrition = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await fetch('http://localhost:5001/api/nutrition/history', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nutrition/history`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -288,7 +288,7 @@ const Home = () => {
       setStepsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5001/api/steps/today', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/steps/today`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -345,7 +345,7 @@ const Home = () => {
     setStepsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/steps/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/steps/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -372,7 +372,7 @@ const Home = () => {
     setStepsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/steps/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/steps/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

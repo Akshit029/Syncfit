@@ -22,7 +22,7 @@ export default function AccountSettings() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5001/api/auth/profile', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -41,7 +41,7 @@ export default function AccountSettings() {
       setSettingsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5001/api/settings/', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/settings/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -71,7 +71,7 @@ export default function AccountSettings() {
     setSettingsSaved(false);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/settings/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/settings/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default function AccountSettings() {
     setProfileStatus(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/auth/profile', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export default function AccountSettings() {
     }
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/auth/password', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/password`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
