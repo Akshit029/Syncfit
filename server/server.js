@@ -8,7 +8,14 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/syncfit';
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://syncfit-six.vercel.app'
+];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
