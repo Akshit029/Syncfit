@@ -190,6 +190,8 @@ const BMICalculators = () => {
     }
   };
 
+  const isLoggedIn = () => !!localStorage.getItem('token');
+
   return (
     <div>
       {/* Main Content */}
@@ -299,7 +301,7 @@ const BMICalculators = () => {
 
                 {/* Calculate Button */}
                 <button
-                  onClick={calculateBMI}
+                  onClick={isLoggedIn() ? calculateBMI : () => setShowLoginPrompt(true)}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
                 >
                   <Calculator size={16} />
@@ -473,7 +475,7 @@ const BMICalculators = () => {
 
                 {/* Calculate Button */}
                 <button
-                  onClick={calculateCalories}
+                  onClick={isLoggedIn() ? calculateCalories : () => setShowLoginPrompt(true)}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
                 >
                   <Flame size={16} />
@@ -614,8 +616,25 @@ const BMICalculators = () => {
           </div>
         </div>
       </main>
+
+      {/* Login Prompt Modal */}
+      <LoginPrompt open={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
     </div>
   );
 };
+
+function LoginPrompt({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="bg-white rounded-xl p-8 shadow-xl text-center">
+        <h2 className="text-2xl font-bold mb-4">Login Required</h2>
+        <p className="mb-6">Please log in to use this feature.</p>
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold" onClick={() => window.location.href = '/login'}>Login</button>
+        <button className="ml-4 px-6 py-2 rounded-xl border border-gray-400" onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
 
 export default BMICalculators;

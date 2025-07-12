@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Edit, Zap, Activity, Heart, TrendingUp, Play, Check, ChevronDown, Star, Award, Sparkles, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FeedbackList from './FeedbackList';
+import { isLoggedIn, LoginPrompt } from '../utils/auth';
 
 // --- WorkoutPlanForm Component ---
 function WorkoutPlanForm({ onClose }) {
@@ -221,6 +222,7 @@ const Home = () => {
 
   // Workout Plan Modal State
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchNutrition = async () => {
@@ -812,6 +814,7 @@ const Home = () => {
         </div>,
         document.body
       )}
+      <LoginPrompt open={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
       </div>
   );
 };

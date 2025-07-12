@@ -17,6 +17,10 @@ import FeedbackList from './components/FeedbackList.jsx';
 import FeedbacksPage from './components/FeedbacksPage.jsx';
 import Workout from './components/Workout.jsx';
 
+function isLoggedIn() {
+  return !!localStorage.getItem('token');
+}
+
 const AppRoutes = () => {
   const location = useLocation();
   const hideNavbar = ['/login', '/signup'].includes(location.pathname);
@@ -37,28 +41,36 @@ const AppRoutes = () => {
   } else {
     bgClass = 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900';
   }
+  const loggedIn = isLoggedIn();
   return (
     <div className={`min-h-screen ${bgClass}`}>
       {!hideNavbar && <Navbar />}
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/nutrition" element={<Nutrition />} />
-        <Route path="/bmi" element={<BMICalculator />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
         <Route path="/features" element={<Features />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/support" element={<Support />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/feedbacks" element={<FeedbacksPage />} />
-        <Route path="/workout" element={<Workout />} />
+        {/* Protected routes */}
+        <Route path="/dashboard" element={loggedIn ? <Dashboard /> : <LoginRedirect />} />
+        <Route path="/nutrition" element={loggedIn ? <Nutrition /> : <LoginRedirect />} />
+        <Route path="/bmi" element={loggedIn ? <BMICalculator /> : <LoginRedirect />} />
+        <Route path="/settings" element={loggedIn ? <Settings /> : <LoginRedirect />} />
+        <Route path="/profile" element={loggedIn ? <Profile /> : <LoginRedirect />} />
+        <Route path="/workout" element={loggedIn ? <Workout /> : <LoginRedirect />} />
       </Routes>
     </div>
   );
 };
+
+function LoginRedirect() {
+  window.location.replace('/login');
+  return null;
+}
 
 function App() {
   return (

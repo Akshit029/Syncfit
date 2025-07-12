@@ -19,9 +19,12 @@ const Dashboard = () => {
   const activityRef = useRef(null);
   const weightRef = useRef(null);
   const milestoneRef = useRef(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Stats
   const [animatedStats, setAnimatedStats] = useState({ workouts: 0, calories: 0, weight: 0 });
+
+  const isLoggedIn = () => !!localStorage.getItem('token');
 
   // Fetch all dashboard data on mount
   useEffect(() => {
@@ -79,6 +82,10 @@ const Dashboard = () => {
   const navItems = ['Home', 'Nutrition', 'Progress', 'Workouts', 'Settings'];
 
   const handleLogActivity = async () => {
+    if (!isLoggedIn()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
@@ -110,6 +117,10 @@ const Dashboard = () => {
   };
 
   const handleLogWeight = async () => {
+    if (!isLoggedIn()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
@@ -138,6 +149,10 @@ const Dashboard = () => {
   };
 
   const handleAddMilestone = async () => {
+    if (!isLoggedIn()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setIsLoading(true);
     const token = localStorage.getItem('token');
     try {
@@ -164,6 +179,10 @@ const Dashboard = () => {
   };
 
   const handleDeleteMilestone = async (id) => {
+    if (!isLoggedIn()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     const token = localStorage.getItem('token');
     try {
       await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/${id}`, {
@@ -176,6 +195,10 @@ const Dashboard = () => {
 
   // Add this function to clear all user data from backend and state
   const handleResetAllData = async () => {
+    if (!isLoggedIn()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     if (!window.confirm('Are you sure you want to reset ALL your data? This cannot be undone.')) return;
     setIsLoading(true);
     const token = localStorage.getItem('token');
@@ -264,7 +287,10 @@ const Dashboard = () => {
               <p className="text-gray-400 text-lg">Track your fitness journey and celebrate your achievements! 🚀</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-              <button className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 rounded-2xl flex items-center space-x-2 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 w-full sm:w-auto">
+              <button
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 rounded-2xl flex items-center space-x-2 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 w-full sm:w-auto"
+                onClick={isLoggedIn() ? () => { setOpenSection('activity'); setTimeout(() => activityRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); } : () => setShowLoginPrompt(true)}
+              >
                 <Activity className="w-5 h-5 group-hover:animate-pulse" />
                 <span onClick={() => { setOpenSection('activity'); setTimeout(() => activityRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="font-medium">Log Workout</span>
               </button>
@@ -333,7 +359,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <button
               className="group bg-gradient-to-r from-blue-600/20 to-blue-700/20 hover:from-blue-600 hover:to-blue-700 backdrop-blur-sm border border-blue-500/30 p-6 rounded-2xl flex items-center space-x-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
-              onClick={() => { setOpenSection('activity'); setTimeout(() => activityRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+              onClick={isLoggedIn() ? () => { setOpenSection('activity'); setTimeout(() => activityRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); } : () => setShowLoginPrompt(true)}
             >
               <div className="w-12 h-12 bg-blue-500/30 group-hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300">
                 <Activity className="w-6 h-6 text-blue-400 group-hover:text-white" />
@@ -345,7 +371,7 @@ const Dashboard = () => {
             </button>
             <button
               className="group bg-gradient-to-r from-purple-600/20 to-purple-700/20 hover:from-purple-600 hover:to-purple-700 backdrop-blur-sm border border-purple-500/30 p-6 rounded-2xl flex items-center space-x-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
-              onClick={() => { setOpenSection('weight'); setTimeout(() => weightRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+              onClick={isLoggedIn() ? () => { setOpenSection('weight'); setTimeout(() => weightRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); } : () => setShowLoginPrompt(true)}
             >
               <div className="w-12 h-12 bg-purple-500/30 group-hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300">
                 <BarChart3 className="w-6 h-6 text-purple-400 group-hover:text-white" />
@@ -357,7 +383,7 @@ const Dashboard = () => {
             </button>
             <button
               className="group bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600 hover:to-green-700 backdrop-blur-sm border border-green-500/30 p-6 rounded-2xl flex items-center space-x-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
-              onClick={() => { setOpenSection('milestone'); setTimeout(() => milestoneRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+              onClick={isLoggedIn() ? () => { setOpenSection('milestone'); setTimeout(() => milestoneRef.current?.scrollIntoView({ behavior: 'smooth' }), 100); } : () => setShowLoginPrompt(true)}
             >
               <div className="w-12 h-12 bg-green-500/30 group-hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300">
                 <Target className="w-6 h-6 text-green-400 group-hover:text-white" />
@@ -633,8 +659,24 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      <LoginPrompt open={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
     </div>
   );
 };
+
+function LoginPrompt({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="bg-white rounded-xl p-8 shadow-xl text-center">
+        <h2 className="text-2xl font-bold mb-4">Login Required</h2>
+        <p className="mb-6">Please log in to use this feature.</p>
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold" onClick={() => window.location.href = '/login'}>Login</button>
+        <button className="ml-4 px-6 py-2 rounded-xl border border-gray-400" onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
 
 export default Dashboard;

@@ -62,6 +62,9 @@ function WorkoutPlanForm() {
   const resultRef = useRef(null);
   const [pdfStatus, setPdfStatus] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  const isLoggedIn = () => !!localStorage.getItem('token');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -340,6 +343,7 @@ function WorkoutPlanForm() {
             type="submit"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-xl text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2 disabled:opacity-60"
             disabled={loading}
+            onClick={isLoggedIn() ? handleSubmit : () => setShowLoginPrompt(true)}
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block mr-2" />
@@ -402,6 +406,21 @@ function WorkoutPlanForm() {
           </div>
         </div>
       )}
+      <LoginPrompt open={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
+    </div>
+  );
+}
+
+function LoginPrompt({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="bg-white rounded-xl p-8 shadow-xl text-center">
+        <h2 className="text-2xl font-bold mb-4">Login Required</h2>
+        <p className="mb-6">Please log in to use this feature.</p>
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold" onClick={() => window.location.href = '/login'}>Login</button>
+        <button className="ml-4 px-6 py-2 rounded-xl border border-gray-400" onClick={onClose}>Cancel</button>
+      </div>
     </div>
   );
 }
