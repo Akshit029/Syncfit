@@ -6,6 +6,15 @@ const SyncFitProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activityHistory, setActivityHistory] = useState([]);
+  const [nutritionHistory, setNutritionHistory] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [settings, setSettings] = useState({ privacy: false, notifications: true });
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsError, setSettingsError] = useState('');
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [workoutsThisMonth, setWorkoutsThisMonth] = useState(0);
+  const [caloriesBurned, setCaloriesBurned] = useState(0);
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
@@ -14,6 +23,7 @@ const SyncFitProfile = () => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [permissionChecked, setPermissionChecked] = useState(false);
 
+  // Fetch user profile
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
@@ -32,10 +42,106 @@ const SyncFitProfile = () => {
     fetchProfile();
   }, []);
 
+  // Fetch activity, nutrition, milestones, and settings
   useEffect(() => {
-    // Check if permission was already granted
-    setPermissionChecked(true);
+    const fetchAll = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        // Activity
+        const actRes = await fetch(`${process.env.REACT_APP_API_URL}/api/activity/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const actData = await actRes.json();
+        setActivityHistory(Array.isArray(actData) ? actData : []);
+        // Nutrition
+        const nutRes = await fetch(`${process.env.REACT_APP_API_URL}/api/nutrition/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const nutData = await nutRes.json();
+        setNutritionHistory(Array.isArray(nutData) ? nutData : []);
+        // Milestones
+        const msRes = await fetch(`${process.env.REACT_APP_API_URL}/api/milestone/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const msData = await msRes.json();
+        setMilestones(Array.isArray(msData) ? msData : []);
+        // Settings
+        setSettingsLoading(true);
+        const setRes = await fetch(`${process.env.REACT_APP_API_URL}/api/settings/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const setData = await setRes.json();
+        setSettings({
+          privacy: setData.privacy ?? false,
+          notifications: setData.notifications ?? true
+        });
+        setSettingsLoading(false);
+        setSettingsError('');
+      } catch (err) {
+        setSettingsError('Failed to fetch some profile data.');
+        setSettingsLoading(false);
+      }
+    };
+    fetchAll();
   }, []);
+
+  // Compute Workouts This Month and Calories Burned
+  useEffect(() => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    const workouts = activityHistory.filter(a => {
+      const d = new Date(a.date);
+      return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    }).reduce((sum, a) => sum + (a.workouts || 0), 0);
+    const calories = activityHistory.filter(a => {
+      const d = new Date(a.date);
+      return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    }).reduce((sum, a) => sum + (a.calories || 0), 0);
+    setWorkoutsThisMonth(workouts);
+    setCaloriesBurned(calories);
+  }, [activityHistory]);
+
+  // Build Recent Activity Feed
+  useEffect(() => {
+    const events = [];
+    activityHistory.slice(-10).reverse().forEach(a => {
+      if (a.workouts) events.push({ type: 'workout', label: 'Workout Logged', value: `${a.workouts} workout${a.workouts > 1 ? 's' : ''}`, date: a.date });
+      if (a.calories) events.push({ type: 'calories', label: 'Calories Burned', value: `${a.calories} cal`, date: a.date });
+    });
+    nutritionHistory.slice(-10).reverse().forEach(n => {
+      if (n.meals && n.meals.length > 0) events.push({ type: 'meal', label: 'Meal Plan Updated', value: `${n.meals.length} meal${n.meals.length > 1 ? 's' : ''}`, date: n.date });
+    });
+    milestones.slice(-10).reverse().forEach(m => {
+      events.push({ type: 'milestone', label: 'Progress Photo Added', value: m.description || '', date: m.date });
+    });
+    // Sort by date descending
+    events.sort((a, b) => new Date(b.date) - new Date(a.date));
+    setRecentActivity(events.slice(0, 5));
+  }, [activityHistory, nutritionHistory, milestones]);
+
+  // Quick Settings Handlers
+  const handleToggle = async (field) => {
+    setSettingsLoading(true);
+    setSettingsError('');
+    try {
+      const token = localStorage.getItem('token');
+      const newSettings = { ...settings, [field]: !settings[field] };
+      setSettings(newSettings);
+      await fetch(`${process.env.REACT_APP_API_URL}/api/settings/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newSettings)
+      });
+      setSettingsLoading(false);
+    } catch {
+      setSettingsError('Failed to update settings.');
+      setSettingsLoading(false);
+    }
+  };
 
   const hasGalleryPermission = () => {
     return localStorage.getItem('galleryPermission') === 'granted';
@@ -295,7 +401,7 @@ const SyncFitProfile = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Workouts This Month</p>
-                    <p className="text-2xl font-bold text-white">24</p>
+                    <p className="text-2xl font-bold text-white">{workoutsThisMonth}</p>
                   </div>
                   <div className="p-3 bg-blue-600/20 rounded-lg">
                     <Dumbbell className="text-blue-400" size={24} />
@@ -307,7 +413,7 @@ const SyncFitProfile = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Calories Burned</p>
-                    <p className="text-2xl font-bold text-white">8,450</p>
+                    <p className="text-2xl font-bold text-white">{caloriesBurned}</p>
                   </div>
                   <div className="p-3 bg-green-600/20 rounded-lg">
                     <TrendingUp className="text-green-400" size={24} />
@@ -320,51 +426,20 @@ const SyncFitProfile = () => {
             <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 shadow-lg">
               <h3 className="text-xl font-bold text-white mb-4">Recent Activity</h3>
               <div className="space-y-3">
-                <div className="flex items-center space-x-4 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="p-2 bg-blue-600/20 rounded-lg">
-                    <Dumbbell className="text-blue-400" size={16} />
+                {recentActivity.map((event, index) => (
+                  <div key={index} className="flex items-center space-x-4 p-3 bg-gray-700/50 rounded-lg">
+                    <div className="p-2 bg-blue-600/20 rounded-lg">
+                      {event.type === 'workout' && <Dumbbell className="text-blue-400" size={16} />}
+                      {event.type === 'calories' && <TrendingUp className="text-green-400" size={16} />}
+                      {event.type === 'meal' && <Apple className="text-green-400" size={16} />}
+                      {event.type === 'milestone' && <Shield className="text-purple-400" size={16} />}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{event.label}</p>
+                      <p className="text-gray-400 text-sm">{new Date(event.date).toLocaleString('default', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-medium">Upper Body Workout</p>
-                    <p className="text-gray-400 text-sm">2 hours ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="p-2 bg-green-600/20 rounded-lg">
-                    <Apple className="text-green-400" size={16} />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Meal Plan Updated</p>
-                    <p className="text-gray-400 text-sm">5 hours ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="p-2 bg-purple-600/20 rounded-lg">
-                    <TrendingUp className="text-purple-400" size={16} />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Progress Photo Added</p>
-                    <p className="text-gray-400 text-sm">1 day ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Settings Quick Access */}
-            <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 shadow-lg">
-              <h3 className="text-xl font-bold text-white mb-4">Quick Settings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button className="flex items-center space-x-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
-                  <Shield className="text-blue-400" size={16} />
-                  <span className="text-white">Privacy Settings</span>
-                </button>
-                
-                <button className="flex items-center space-x-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
-                  <Bell className="text-green-400" size={16} />
-                  <span className="text-white">Notifications</span>
-                </button>
+                ))}
               </div>
             </div>
           </div>
