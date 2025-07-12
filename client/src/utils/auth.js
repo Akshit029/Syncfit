@@ -1,10 +1,9 @@
+import React from 'react';
 // Authentication utility
 export function isLoggedIn() {
   return !!localStorage.getItem('token');
 }
-
 // Reusable LoginPrompt modal
-import React from 'react';
 export function LoginPrompt({ open, onClose }) {
   if (!open) return null;
   return (
