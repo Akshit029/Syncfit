@@ -59,7 +59,7 @@ function WorkoutPlanForm({ onClose }) {
     <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl max-w-lg mx-auto relative">
       <button onClick={onClose} className="absolute top-2 right-2 p-2 rounded-full bg-red-500 hover:bg-red-600 text-white"><X className="w-5 h-5" /></button>
       <h2 className="text-2xl font-bold mb-4 text-white flex items-center gap-2"><Sparkles className="w-6 h-6" /> Generate Workout Plan</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+      <form onSubmit={isLoggedIn() ? handleSubmit : (e) => { e.preventDefault(); setShowLoginPrompt(true); }} className="grid grid-cols-1 gap-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Age</label>
@@ -468,6 +468,7 @@ const Home = () => {
               <div className="flex flex-wrap justify-center gap-6">
                 <Link
                   to="/workout"
+                  onClick={!isLoggedIn() ? (e) => { e.preventDefault(); setShowLoginPrompt(true); } : undefined}
                   className="group relative bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-10 py-5 rounded-2xl flex items-center space-x-3 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-blue-500/25"
                 >
                   <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -476,6 +477,7 @@ const Home = () => {
                 </Link>
                 <Link
                   to="/nutrition"
+                  onClick={!isLoggedIn() ? (e) => { e.preventDefault(); setShowLoginPrompt(true); } : undefined}
                   className="group relative bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white px-10 py-5 rounded-2xl flex items-center space-x-3 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-green-500/25"
                 >
                   <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -516,7 +518,7 @@ const Home = () => {
                   </div>
                 </div>
                 <button 
-                  onClick={handleStepsReset}
+                  onClick={isLoggedIn() ? handleStepsReset : () => setShowLoginPrompt(true)}
                   className="group bg-red-500/20 hover:bg-red-500/30 text-red-400 px-6 py-3 rounded-xl font-semibold transition-all border border-red-500/30 hover:border-red-500/50"
                 >
                   <span className="group-hover:animate-pulse">Reset</span>
@@ -599,7 +601,7 @@ const Home = () => {
                   />
                   <div className="flex space-x-4">
                     <button 
-                      onClick={handleStepsSubmit}
+                      onClick={isLoggedIn() ? handleStepsSubmit : () => setShowLoginPrompt(true)}
                       className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white py-4 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg"
                     >
                       Update Steps
@@ -614,7 +616,7 @@ const Home = () => {
                 </div>
               ) : (
                 <button 
-                  onClick={() => setShowStepsInput(true)}
+                  onClick={isLoggedIn() ? () => setShowStepsInput(true) : () => setShowLoginPrompt(true)}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white py-5 rounded-2xl flex items-center justify-center space-x-3 transition-all transform hover:scale-105 shadow-2xl font-bold text-lg"
                 >
                   <Edit className="w-6 h-6" />
@@ -645,6 +647,7 @@ const Home = () => {
           </h3>
           <Link
             to="/nutrition"
+            onClick={!isLoggedIn() ? (e) => { e.preventDefault(); setShowLoginPrompt(true); } : undefined}
             className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white px-4 py-2 rounded-xl font-bold shadow hover:scale-105 transition-all duration-200"
           >
             + Add Log
@@ -738,7 +741,7 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-8 sm:mt-0 sm:ml-8 w-full sm:w-auto space-y-4 flex-shrink-0">
-                <button onClick={handleAskAI} className="group relative bg-white/10 hover:bg-white/20 text-white w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 rounded-2xl flex items-center justify-center space-x-3 transition-all border border-white/20">
+                <button onClick={isLoggedIn() ? handleAskAI : () => setShowLoginPrompt(true)} className="group relative bg-white/10 hover:bg-white/20 text-white w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 rounded-2xl flex items-center justify-center space-x-3 transition-all border border-white/20">
                   <Sparkles className="w-6 h-6" />
                   <span className="font-bold">Ask AI</span>
                 </button>

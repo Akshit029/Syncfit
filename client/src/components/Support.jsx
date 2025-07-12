@@ -47,7 +47,7 @@ ${form.message}
             <p className="text-gray-400 mb-2">Email: <a href="mailto:chadgalakshit1@gmail.com" className="text-blue-400 underline">chadgalakshit1@gmail.com</a></p>
             <p className="text-gray-400">Fill out the form below and click submit to open your email client with a pre-filled message.</p>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+          <form onSubmit={isLoggedIn() ? handleSubmit : (e) => { e.preventDefault(); setShowLoginPrompt(true); }} className="space-y-6 mt-8">
             <div>
               <label className="block text-gray-300 mb-2">Name</label>
               <input type="text" name="name" value={form.name} onChange={handleChange} className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
