@@ -96,7 +96,7 @@ const Feedback = () => {
               <div className="text-green-400 text-lg font-semibold py-8">Thank you for your feedback!</div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={isLoggedIn() ? handleSubmit : (e) => { e.preventDefault(); setShowLoginPrompt(true); }} className="space-y-6">
               <div>
                 <label className="block text-gray-300 mb-2">Name</label>
                 <input type="text" name="name" value={form.name} onChange={handleChange} className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
