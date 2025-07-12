@@ -1,101 +1,47 @@
-# SyncFit Backend API
+# SyncFit Backend
 
-## Authentication
+## Setup
 
-### Register
-- **POST** `/api/auth/register`
-- Body: `{ "name": "John", "email": "john@example.com", "password": "secret" }`
-- Response: `{ message, user: { id, name, email } }`
+1. Install dependencies:
+```bash
+npm install
+```
 
-### Login
-- **POST** `/api/auth/login`
-- Body: `{ "email": "john@example.com", "password": "secret" }`
-- Response: `{ token, user: { id, name, email } }`
+2. Create a `.env` file with the following variables:
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+GEMINI_API_KEY=your_gemini_api_key
+EMAIL_USER=your_gmail_address@gmail.com
+EMAIL_PASS=your_gmail_app_password
+```
 
-### Profile (Protected)
-- **GET** `/api/auth/profile`
-- Header: `Authorization: Bearer <token>`
-- Response: `{ id, name, email, ... }`
+3. For Gmail setup (OTP emails):
+   - Enable 2-factor authentication on your Gmail account
+   - Generate an App Password: Google Account → Security → App Passwords
+   - Use the generated password in EMAIL_PASS
 
-## BMI
+4. Start the server:
+```bash
+npm start
+```
 
-### Save BMI Calculation (Protected)
-- **POST** `/api/bmi/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ value, height, weight, unit }`
-- Response: BMI object
+## OTP Verification
 
-### Get BMI History (Protected)
-- **GET** `/api/bmi/history`
-- Header: `Authorization: Bearer <token>`
-- Response: `[ ...BMI objects... ]` 
+The app now includes OTP verification for both signup and login:
 
-## Steps
+- **Signup**: Users must verify their email with OTP before account creation
+- **Login**: OTP is optional for additional security
 
-### Save or Update Today's Steps (Protected)
-- **POST** `/api/steps/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ steps: 12345 }`
-- Response: Steps object
+## API Endpoints
 
-### Get Today's Steps (Protected)
-- **GET** `/api/steps/today`
-- Header: `Authorization: Bearer <token>`
-- Response: `{ steps: 12345 }` or `{ steps: 0 }` 
-
-## Activity (Workouts/Calories)
-
-### Log Activity (Protected)
-- **POST** `/api/activity/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ date: 'YYYY-MM-DD', workouts: 2, calories: 500 }`
-- Response: Activity object
-
-### Get Weekly Summary (Protected)
-- **GET** `/api/activity/summary`
-- Header: `Authorization: Bearer <token>`
-- Response: `[ ...Activity objects... ]`
-
-## Weight
-
-### Log Weight (Protected)
-- **POST** `/api/weight/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ date: 'YYYY-MM-DD', weight: 70 }`
-- Response: Weight object
-
-### Get Weight History (Protected)
-- **GET** `/api/weight/history`
-- Header: `Authorization: Bearer <token>`
-- Response: `[ ...Weight objects... ]`
-
-## Milestone
-
-### Add Milestone (Protected)
-- **POST** `/api/milestone/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ description: 'Lost 5kg', date: 'YYYY-MM-DD' }`
-- Response: Milestone object
-
-### Get All Milestones (Protected)
-- **GET** `/api/milestone/`
-- Header: `Authorization: Bearer <token>`
-- Response: `[ ...Milestone objects... ]` 
-
-### Delete Milestone (Protected)
-- **DELETE** `/api/milestone/:id`
-- Header: `Authorization: Bearer <token>`
-- Response: `{ message: 'Milestone deleted' }` 
-
-## Nutrition
-
-### Log Nutrition (Protected)
-- **POST** `/api/nutrition/`
-- Header: `Authorization: Bearer <token>`
-- Body: `{ date: 'YYYY-MM-DD', calories, protein, carbs, fats, meals: [{ name, calories, protein, carbs, fats }] }`
-- Response: Nutrition object
-
-### Get Nutrition History (Protected)
-- **GET** `/api/nutrition/history`
-- Header: `Authorization: Bearer <token>`
-- Response: `[ ...Nutrition objects... ]` 
+- `POST /api/auth/send-otp` - Send OTP for registration
+- `POST /api/auth/send-login-otp` - Send OTP for login
+- `POST /api/auth/register` - Register with OTP verification
+- `POST /api/auth/login` - Login with optional OTP
+- `GET /api/auth/profile` - Get user profile
+- `PATCH /api/auth/profile` - Update profile
+- `PATCH /api/auth/password` - Update password
+- `POST /api/auth/profile-image` - Upload profile image
+- `DELETE /api/auth/profile-image` - Remove profile image
+- `DELETE /api/auth/profile` - Delete account 
