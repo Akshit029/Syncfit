@@ -10,7 +10,6 @@ export default function SyncFitLogin() {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  const [showOtpField, setShowOtpField] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -22,7 +21,6 @@ export default function SyncFitLogin() {
       alert('Please enter your email first');
       return;
     }
-    
     setLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/send-login-otp`, {
@@ -33,7 +31,6 @@ export default function SyncFitLogin() {
       const data = await res.json();
       if (res.ok) {
         setOtpSent(true);
-        setShowOtpField(true);
         setResendTimer(60);
         const timer = setInterval(() => {
           setResendTimer(prev => {
@@ -66,7 +63,7 @@ export default function SyncFitLogin() {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, otp: showOtpField ? otp : undefined })
+        body: JSON.stringify({ email, password, otp })
       });
       const data = await res.json();
       if (res.ok) {
@@ -84,7 +81,6 @@ export default function SyncFitLogin() {
 
   const goBack = () => {
     setOtpSent(false);
-    setShowOtpField(false);
     setOtp('');
     setResendTimer(0);
   };
@@ -105,107 +101,110 @@ export default function SyncFitLogin() {
             <p className="text-gray-400">Sign in to your account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label className="text-gray-300 text-sm font-medium">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-gray-300 text-sm font-medium">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            {/* OTP Field (optional) */}
-            {showOtpField && (
-              <>
-                <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">Enter OTP (Optional)</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-center text-2xl tracking-widest"
-                      placeholder="000000"
-                      maxLength="6"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-400">Enter the 6-digit code sent to {email} (optional for extra security)</p>
+          {!otpSent ? (
+            <form onSubmit={(e) => { e.preventDefault(); handleSendOTP(); }} className="space-y-6">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label className="text-gray-300 text-sm font-medium">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="Enter your email"
+                    required
+                  />
                 </div>
-                
-                {/* Resend OTP */}
-                <div className="text-center">
+              </div>
+              {/* Password Field */}
+              <div className="space-y-2">
+                <label className="text-gray-300 text-sm font-medium">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="Enter your password"
+                    required
+                  />
                   <button
                     type="button"
-                    onClick={handleResendOTP}
-                    disabled={resendTimer > 0}
-                    className="text-blue-400 hover:text-blue-300 transition-colors disabled:text-gray-500 disabled:cursor-not-allowed"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
-                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-              </>
-            )}
-
-            {/* Send OTP Button */}
-            {!showOtpField && (
+              </div>
+              {/* Send OTP Button */}
               <button
-                type="button"
-                onClick={handleSendOTP}
-                disabled={loading}
+                type="submit"
                 className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center"
+                disabled={loading}
               >
                 {loading ? (
                   <span className="flex items-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Sending OTP...</span>
                 ) : (
-                  'Send OTP (Optional)'
+                  'Send OTP'
                 )}
               </button>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="flex items-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Signing In...</span>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </form>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Back Button */}
+              <button
+                type="button"
+                onClick={goBack}
+                className="flex items-center text-gray-400 hover:text-white transition-colors mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </button>
+              {/* OTP Field */}
+              <div className="space-y-2">
+                <label className="text-gray-300 text-sm font-medium">Enter OTP</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-center text-2xl tracking-widest"
+                    placeholder="000000"
+                    maxLength="6"
+                    required
+                  />
+                </div>
+                <p className="text-sm text-gray-400">Enter the 6-digit code sent to {email}</p>
+              </div>
+              {/* Resend OTP */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleResendOTP}
+                  disabled={resendTimer > 0}
+                  className="text-blue-400 hover:text-blue-300 transition-colors disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                </button>
+              </div>
+              {/* Sign In Button */}
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Signing In...</span>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+            </form>
+          )}
 
           {/* Sign Up Link */}
           <div className="text-center mt-6">
