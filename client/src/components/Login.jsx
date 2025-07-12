@@ -92,13 +92,6 @@ export default function SyncFitLogin() {
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="text-right">
-              <a href="#" className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
-                Forgot password?
-              </a>
-            </div>
-
             {/* Submit Button */}
             <button
               type="submit"
