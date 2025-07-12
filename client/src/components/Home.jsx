@@ -6,7 +6,7 @@ import FeedbackList from './FeedbackList';
 import { isLoggedIn, LoginPrompt } from '../utils/auth';
 
 // --- WorkoutPlanForm Component ---
-function WorkoutPlanForm({ onClose }) {
+function WorkoutPlanForm({ onClose, setShowLoginPrompt }) {
   const [form, setForm] = useState({
     age: '',
     gender: '',
@@ -813,7 +813,7 @@ const Home = () => {
       {/* Workout Plan Modal */}
       {showWorkoutForm && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <WorkoutPlanForm onClose={() => setShowWorkoutForm(false)} />
+          <WorkoutPlanForm onClose={() => setShowWorkoutForm(false)} setShowLoginPrompt={setShowLoginPrompt} />
         </div>,
         document.body
       )}
