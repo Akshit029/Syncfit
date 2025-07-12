@@ -3,7 +3,7 @@ import { isLoggedIn, LoginPrompt } from '../utils/auth';
 
 const Support = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
