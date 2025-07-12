@@ -75,25 +75,38 @@ router.post('/send-otp', async (req, res) => {
     if (!email) return res.status(400).json({ message: 'Email is required' });
     
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'Email already registered' });
+    if (existingUser && existingUser.isEmailVerified) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
     
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     
-    // Store OTP temporarily (you might want to use Redis in production)
-    // For now, we'll create a temporary user record
-    const tempUser = await User.create({
-      name: 'temp',
-      email,
-      password: 'temp',
-      otp,
-      otpExpiry,
-      isEmailVerified: false
-    });
+    let tempUser;
+    
+    if (existingUser && !existingUser.isEmailVerified) {
+      // Update existing unverified user with new OTP
+      existingUser.otp = otp;
+      existingUser.otpExpiry = otpExpiry;
+      await existingUser.save();
+      tempUser = existingUser;
+    } else {
+      // Create new temporary user
+      tempUser = await User.create({
+        name: 'temp',
+        email,
+        password: 'temp',
+        otp,
+        otpExpiry,
+        isEmailVerified: false
+      });
+    }
     
     const emailSent = await sendOTPEmail(email, otp);
     if (!emailSent) {
-      await User.findByIdAndDelete(tempUser._id);
+      if (!existingUser) {
+        await User.findByIdAndDelete(tempUser._id);
+      }
       return res.status(500).json({ message: 'Failed to send OTP' });
     }
     
@@ -140,7 +153,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
     
-    // Find temporary user
+    // Find temporary user or existing unverified user
     const tempUser = await User.findById(tempUserId);
     if (!tempUser || tempUser.email !== email) {
       return res.status(400).json({ message: 'Invalid OTP request' });
@@ -152,21 +165,42 @@ router.post('/register', async (req, res) => {
     }
     
     if (tempUser.otpExpiry < new Date()) {
-      await User.findByIdAndDelete(tempUserId);
+      if (!tempUser.isEmailVerified) {
+        await User.findByIdAndDelete(tempUserId);
+      }
       return res.status(400).json({ message: 'OTP expired' });
     }
     
-    // Create actual user
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      name,
-      email,
-      password: hash,
-      isEmailVerified: true
-    });
+    let user;
     
-    // Delete temporary user
-    await User.findByIdAndDelete(tempUserId);
+    if (tempUser.isEmailVerified) {
+      // This shouldn't happen, but handle it gracefully
+      return res.status(400).json({ message: 'User already verified' });
+    } else {
+      // Update the existing unverified user or create new user
+      if (tempUser.name === 'temp' && tempUser.password === 'temp') {
+        // This was a temporary user, create the actual user
+        const hash = await bcrypt.hash(password, 10);
+        user = await User.create({
+          name,
+          email,
+          password: hash,
+          isEmailVerified: true
+        });
+        // Delete temporary user
+        await User.findByIdAndDelete(tempUserId);
+      } else {
+        // This was an existing unverified user, update it
+        const hash = await bcrypt.hash(password, 10);
+        tempUser.name = name;
+        tempUser.password = hash;
+        tempUser.isEmailVerified = true;
+        tempUser.otp = undefined;
+        tempUser.otpExpiry = undefined;
+        await tempUser.save();
+        user = tempUser;
+      }
+    }
     
     const token = jwt.sign(
       { id: user._id, name: user.name, email: user.email },
@@ -189,7 +223,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password, otp } = req.body;
-    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+    if (!email || !password || !otp) return res.status(400).json({ message: 'Email, password, and OTP are required' });
     
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
@@ -197,21 +231,19 @@ router.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
     
-    // If OTP is provided, verify it
-    if (otp) {
-      if (!user.otp || user.otp !== otp) {
-        return res.status(400).json({ message: 'Invalid OTP' });
-      }
-      
-      if (user.otpExpiry < new Date()) {
-        return res.status(400).json({ message: 'OTP expired' });
-      }
-      
-      // Clear OTP after successful verification
-      user.otp = undefined;
-      user.otpExpiry = undefined;
-      await user.save();
+    // OTP is now required for login
+    if (!user.otp || user.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
     }
+    
+    if (user.otpExpiry < new Date()) {
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+    
+    // Clear OTP after successful verification
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
     
     const token = jwt.sign(
       { id: user._id, name: user.name, email: user.email },
