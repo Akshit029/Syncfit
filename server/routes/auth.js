@@ -189,16 +189,15 @@ router.post('/register', async (req, res) => {
         }
         // If there are other unverified users, clean them up except the current tempUser
         await User.deleteMany({ email, isEmailVerified: false, _id: { $ne: tempUserId } });
-        // Create the actual user
+        // Update the temp user with real data and mark as verified
         const hash = await bcrypt.hash(password, 10);
-        user = await User.create({
-          name,
-          email,
-          password: hash,
-          isEmailVerified: true
-        });
-        // Delete temporary user
-        await User.findByIdAndDelete(tempUserId);
+        tempUser.name = name;
+        tempUser.password = hash;
+        tempUser.isEmailVerified = true;
+        tempUser.otp = undefined;
+        tempUser.otpExpiry = undefined;
+        await tempUser.save();
+        user = tempUser;
       } else {
         // This was an existing unverified user, update it
         const hash = await bcrypt.hash(password, 10);
