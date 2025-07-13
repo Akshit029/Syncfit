@@ -179,13 +179,16 @@ router.post('/register', async (req, res) => {
     } else {
       // Update the existing unverified user or create new user
       if (tempUser.name === 'temp' && tempUser.password === 'temp') {
-        // Check if a verified user with this email already exists
-        const existingVerified = await User.findOne({ email, isEmailVerified: true });
+        // Check if any user with this email already exists
+        const existingUsers = await User.find({ email });
+        const existingVerified = existingUsers.find(u => u.isEmailVerified);
         if (existingVerified) {
-          // Clean up temp user
-          await User.findByIdAndDelete(tempUserId);
+          // Clean up all unverified users with this email
+          await User.deleteMany({ email, isEmailVerified: false });
           return res.status(400).json({ message: 'Email already registered' });
         }
+        // If there are other unverified users, clean them up except the current tempUser
+        await User.deleteMany({ email, isEmailVerified: false, _id: { $ne: tempUserId } });
         // Create the actual user
         const hash = await bcrypt.hash(password, 10);
         user = await User.create({
