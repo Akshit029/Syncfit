@@ -484,11 +484,11 @@ const Home = () => {
                   <Heart className="w-6 h-6 relative z-10" />
                   <span className="font-bold text-lg relative z-10">Track Nutrition</span>
                 </Link>
-                <button className="group relative bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white px-10 py-5 rounded-2xl flex items-center space-x-3 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-purple-500/25">
+                {/* <button className="group relative bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white px-10 py-5 rounded-2xl flex items-center space-x-3 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-purple-500/25">
                   <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <TrendingUp className="w-6 h-6 relative z-10" />
                   <span className="font-bold text-lg relative z-10">View Progress</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
