@@ -362,7 +362,7 @@ const SyncFitProfile = () => {
                           <Mail className="text-blue-400" size={18} />
                           <span className="text-gray-400 text-sm font-medium">EMAIL</span>
                         </div>
-                        <p className="text-white font-semibold">{userData?.email || '...'}</p>
+                        <p className="text-white font-semibold break-all truncate">{userData?.email || '...'}</p>
                       </div>
                       <div className="bg-gray-700/50 rounded-lg p-4">
                         <div className="flex items-center space-x-3 mb-2">
