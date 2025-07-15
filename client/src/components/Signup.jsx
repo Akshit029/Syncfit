@@ -3,6 +3,7 @@ import { Eye, EyeOff, Mail, Lock, User, Dumbbell, ArrowLeft } from 'lucide-react
 import { useNavigate } from 'react-router-dom';
 
 export default function SyncFitSignup() {
+  console.log('API URL:', process.env.REACT_APP_API_URL);
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
