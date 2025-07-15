@@ -1,0 +1,6 @@
+ # Ignore environment variable files
+.env
+.env.local
+
+# Ignore user uploads
+server/uploads/
